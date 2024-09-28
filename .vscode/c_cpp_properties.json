@@ -6,7 +6,7 @@
                 "${workspaceFolder}/**",
                 "/usr/lib/avr/**"
             ],
-            "defines": [],
+            "defines": ["__AVR_ATmega328P__"],
             "compilerPath": "/usr/bin/avr-gcc",
             "cStandard": "c17",
             "cppStandard": "c++98",
