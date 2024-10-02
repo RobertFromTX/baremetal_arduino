@@ -4,7 +4,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 
-#define CE_PIN   9
+#define CE_PIN   9  
 #define CSN_PIN 10
 
 const byte thisSlaveAddress[5] = {'R','x','A','A','A'};
@@ -21,7 +21,9 @@ void setup() {
     Serial.begin(9600);
 
     Serial.println("SimpleRx Starting");
-    radio.begin();
+    bool working = radio.begin();
+    radio.setPALevel(RF24_PA_LOW);
+    Serial.println(working);
     radio.setDataRate( RF24_250KBPS );
     radio.openReadingPipe(1, thisSlaveAddress);
     radio.startListening();

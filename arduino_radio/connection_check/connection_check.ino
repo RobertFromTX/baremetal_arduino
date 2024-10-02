@@ -16,6 +16,7 @@ bool newData = false;
 
 
 void setup() {
+
     Serial.begin(9600);
     printf_begin();
 
@@ -27,6 +28,7 @@ void setup() {
     Serial.println("     communicating with the nRF24");
     Serial.println();
     bool gay = radio.begin();
+    radio.setPALevel(RF24_PA_MIN);
     radio.printDetails();
     Serial.println();
     Serial.println();
@@ -37,7 +39,7 @@ void setup() {
     radio.setDataRate( RF24_250KBPS );
     radio.printDetails();
     Serial.println();
-    Serial.println();
+    Serial.println(gay);
 }
 
 

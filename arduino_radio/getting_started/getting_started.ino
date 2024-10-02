@@ -87,10 +87,11 @@ void setup() {
     radio.startListening();  // put radio in RX mode
   }
 
+
   // For debugging info
-  // printf_begin();             // needed only once for printing details
+  printf_begin();             // needed only once for printing details
   // radio.printDetails();       // (smaller) function that prints raw register values
-  // radio.printPrettyDetails(); // (larger) function that prints human readable data
+  radio.printPrettyDetails(); // (larger) function that prints human readable data
 
 }  // setup
 
