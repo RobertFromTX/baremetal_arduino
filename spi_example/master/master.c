@@ -39,9 +39,32 @@ int main(void)
 
     while(1)
     {
+        USART_Transmit('M');  
         USART_Transmit('T');
+        USART_Transmit('B');
         USART_Transmit('\n');
-        SPI_MasterTransmit('A');
+        SPI_MasterTransmit('M');
+        USART_Transmit('M'); 
+        USART_Transmit('T');
+        USART_Transmit('E');
+        USART_Transmit('\n');
+
+
+        _delay_ms(500);
+
+        USART_Transmit('M');  
+        USART_Transmit('R');
+        USART_Transmit('B');
+        USART_Transmit('\n');
+        char data = SPI_MasterReceive();
+        USART_Transmit(data);
+        USART_Transmit('\n');
+        USART_Transmit('M'); 
+        USART_Transmit('R');
+        USART_Transmit('E');
+        USART_Transmit('\n');
+
+
         _delay_ms(500);
     }
 

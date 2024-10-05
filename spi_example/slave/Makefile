@@ -8,4 +8,4 @@ default:
 	#taking output elf (slave.bin that we got from compilation), removing eeprom section, 
 	#outputting it as intel hex in slave.hex #avrdude (program that flashes our code) takes in intel hex format
 	avr-objcopy -O ihex -R .eeprom slave.bin slave.hex 
-	sudo avrdude -F -V -c arduino -p ATMEGA328p -P /dev/ttyUSB1 -b 115200 -U flash:w:slave.hex
+	sudo avrdude -F -V -c arduino -p ATMEGA328p -P /dev/ttyUSB0 -b 115200 -U flash:w:slave.hex

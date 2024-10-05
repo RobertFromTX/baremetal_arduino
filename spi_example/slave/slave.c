@@ -37,12 +37,25 @@ int main(void)
     USART_Init(MYUBRR);
     while(1)
     {
-
+        USART_Transmit('S');
+        USART_Transmit('R');
         USART_Transmit('B');
         USART_Transmit('\n');
         char data = SPI_SlaveReceive();
         USART_Transmit(data);
         USART_Transmit('\n');
+        USART_Transmit('S');
+        USART_Transmit('R');
+        USART_Transmit('E');
+        USART_Transmit('\n');
+
+        USART_Transmit('S');
+        USART_Transmit('T');
+        USART_Transmit('B');
+        USART_Transmit('\n');
+        SPI_SlaveTransmit('S');
+        USART_Transmit('S');
+        USART_Transmit('T');
         USART_Transmit('E');
         USART_Transmit('\n');
         _delay_ms(500);
