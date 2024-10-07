@@ -72,6 +72,6 @@ void SPI_SlaveTransmit(char cData)
     //_delay_ms(2000);
     while (PINB & 1<<SS); //used to be PORTB
     while(!(SPSR & (1<<SPIF))); //wait for transmission to end
-
+    
     //PORTB = PORTB & ~(1 << PORTB1);
 }
