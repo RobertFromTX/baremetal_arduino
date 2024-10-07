@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C"{
+#endif 
+
 // #ifndef SPI_H
 // #define SPI_H
 
@@ -16,3 +20,7 @@ char SPI_SlaveReceive(void);
 void SPI_SlaveTransmit(char cData);
 
 // #endif
+
+#ifdef __cplusplus
+}
+#endif

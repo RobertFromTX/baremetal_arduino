@@ -70,7 +70,7 @@ void SPI_SlaveTransmit(char cData)
     //PORTB = PORTB | (1 << PORTB1); //led is on until transmission done
 
     //_delay_ms(2000);
-    while (PORTB & 1<<SS);
+    while (PINB & 1<<SS); //used to be PORTB
     while(!(SPSR & (1<<SPIF))); //wait for transmission to end
 
     //PORTB = PORTB & ~(1 << PORTB1);

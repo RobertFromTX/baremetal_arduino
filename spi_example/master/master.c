@@ -50,7 +50,8 @@ int main(void)
         USART_Transmit('T');
         USART_Transmit('E');
         USART_Transmit('\n');
-
+        USART_Transmit(SPDR);  
+        USART_Transmit('\n');
 
         _delay_ms(100);
 
