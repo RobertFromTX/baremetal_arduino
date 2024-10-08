@@ -3,6 +3,7 @@
         "delay.h": "c",
         "io.h": "c",
         "io43u32x.h": "c",
-        "spi.h": "c"
+        "spi.h": "c",
+        "interrupt.h": "c"
     }
 }

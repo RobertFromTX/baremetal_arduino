@@ -1,6 +1,6 @@
 #include "spi.h" 
 //#include "./../spi_lib/spi.h"
-
+#include <RF24/RF24.h>
 #include "uart.h"
 
 #include <avr/io.h> //not sure if this ruins it since already included in spi.h

@@ -17,7 +17,7 @@ main:
 	#taking output elf (master.bin that we got from compilation), removing eeprom section, 
 	#outputting it as intel hex in master.hex #avrdude (program that flashes our code) takes in intel hex format
 	avr-objcopy -O ihex -R .eeprom master.bin master.hex 
-	sudo avrdude -F -V -c arduino -p ATMEGA328p -P /dev/ttyUSB0 -b 115200 -U flash:w:master.hex
+	sudo avrdude -F -V -c arduino -p ATMEGA328p -P /dev/ttyUSB1 -b 115200 -U flash:w:master.hex
 
 clean:
 
