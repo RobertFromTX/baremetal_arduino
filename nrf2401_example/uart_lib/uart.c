@@ -50,3 +50,26 @@ void USART_Flush(void)
 unsigned char dummy;
 while (UCSR0A & (1<<RXC0)) dummy = UDR0;
 }
+
+void USART_Print_Int(int data)
+{
+	int divider = 1;
+	int digit = 0;
+	int values[4] = {};
+	int digit_count = 0;
+	while(data/divider != 0)
+	{
+		digit = (data/divider)%10;
+		//printf("%d",digit);
+		divider *=10;
+		values[digit_count] = digit;
+		digit_count +=1;
+
+	}
+	for(int i = digit_count-1; i>=0; --i)
+	{
+		USART_Transmit(values[i]+0x30);
+		
+	}
+	USART_Transmit('\n');
+}

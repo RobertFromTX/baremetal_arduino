@@ -29,7 +29,7 @@
 #define SS DDB2
 #define CE DDB1
 
-#define dataLen 3  //längd på datapacket som skickas/tas emot
+#define dataLen 5  //längd på datapacket som skickas/tas emot
 uint8_t *data;
 uint8_t *arr;
 
@@ -204,6 +204,71 @@ void nrf24L01_init(void)
 }
 
 
+
+void nrf24L01_init_receive(void)
+{
+	_delay_ms(100);	//allow radio to reach power down if shut down
+	
+	uint8_t val[5]; //An array of integers to send to the *WriteToNrf function	
+
+	//EN_AA - (auto-acknowledgements) - Transmitter gets automatic response from receiver when successful transmission! (lovely function!) 
+	//Only works if Transmitter has identical RF_address on its channel ex: RX_ADDR_P0 = TX_ADDR
+	val[0]=0x01;	//set value
+	WriteToNrf(W, EN_AA, val, 1);	//W=write mode, EN_AA=register to write to, val=data to write, 1=number of data bytes.
+	
+	//SETUP_RETR (the setup for "EN_AA")
+	val[0]=0x2F;	//0b0010 00011 "2" sets it up to 750uS delay between every retry (at least 500us at 250kbps and if payload >5bytes in 1Mbps, 
+					//and if payload >15byte in 2Mbps) "F" is number of retries (1-15, now 15)
+	WriteToNrf(W, SETUP_RETR, val, 1);
+	
+	//Choose number of enabled data pipes (1-5)	
+	val[0]=0x01;
+	WriteToNrf(W, EN_RXADDR, val, 1); //enable data pipe 0
+
+	//RF_Address width setup (how many bytes is the receiver address, the more the merrier 1-5)	
+	val[0]=0x03;	//0b0000 00011 = 5 bytes RF_Address
+	WriteToNrf(W, SETUP_AW, val, 1); 
+
+	//RF channel setup - choose frequency 2,400-2,527 GHz 1MHz/step
+	val[0]=0x01;	//RD Channel registry 0b0000 0001 = 2,401 GHz (same on TX and RX)	
+	WriteToNrf(W, RF_CH, val, 1); 
+	
+	//RF setup	- choose power mode and data speed. here is the difference with the (+) version!!! 
+	val[0]=0x07;	//00000111 bit 3="0" 1Mbps=longer range, 2-1 power mode ("11" = -0dB ; "00"=-18dB) 	
+	WriteToNrf(W, RF_SETUP, val, 1);
+
+	//RX RF_Adress setup 5 byte - Set Receiver address (set RX_ADDR_P0 = TX_ADDR if EN_AA is enabled!!!) 
+	int i;
+	for(i=0; i<5; i++)	
+	{
+		val[i]=0x12;	//0x12 x 5 to get a long and secure address.	
+	}
+	WriteToNrf(W, RX_ADDR_P0, val, 5); //since we chose pipe 0 on EN_RXADDR we give this address to that channel 
+	//Here you can give different addresses to different channels (if they are enabled in EN_RXADDR) to listen on several different transmitters)
+
+	//TX RF_Address setup 5 bytes - Set transmitter address (not used in a receiver but can be set anyways)	
+	for(i=0; i<5; i++)	
+	{
+		val[i]=0x12;	//0x12 x 5 - same on the Receiver chip and the RX-RF_Address above if EN_AA is enabled!!!
+	}
+	WriteToNrf(W, TX_ADDR, val, 5); 
+
+	// payload width setup - 1-32byte (how many bytes to send per transmission) 
+	val[0]=dataLen;		//Send 5 bytes per package this time (same on receiver and transmitter)
+	WriteToNrf(W, RX_PW_P0, val, 1);
+	
+	//CONFIG reg setup - Now it's time to boot up the nRF and choose if it's supposed to be a transmitter or receiver
+	val[0]=0x1F;  //0b0000 1110 - bit 0="0":transmitter bit 0="1":Receiver, bit 1="1"=power up,
+					//bit 4="1" = mask_MAX_RT i.e IRQ-interrupt is not triggered if transmission failed.
+	WriteToNrf(W, NRF_CONFIG, val, 1);
+
+//device need 1.5ms to reach standby mode (CE=low)
+	_delay_ms(100);	
+
+	//sei();	
+}
+
+
 //Send data
 void transmit_payload(uint8_t * W_buff)
 {
@@ -211,7 +276,7 @@ void transmit_payload(uint8_t * W_buff)
 	WriteToNrf(R, W_TX_PAYLOAD, W_buff, dataLen);	//Sends the data in W_buff to the nRF
 	//Why Flush_TX and W_TX_Payload is sent with an "R" instead of "W" is because they are on the highest byte-level in the nRF (see datasheet below)!
 
-	sei();	//enable global interrupt (if interrupt is used) 
+	//sei();	//enable global interrupt (if interrupt is used) 
 
 	_delay_ms(10);		//needs 10ms delay to work after loading the nRF with the payload for some reason	
 	SETBIT(PORTB, 1);	//CE high=transmit the data!
@@ -253,18 +318,173 @@ void reset(void)
 
 int main(void)
 {
-	InitSPI();
-	USART_Init(MYUBRR);
-    while(1)
-    {
-		USART_Transmit('B');
-		USART_Transmit('\n');
-        USART_Transmit(GetReg(NRF_STATUS));
-		USART_Transmit('\n');
+	// InitSPI();
+	// USART_Init(MYUBRR);
+    // while(1)
+    // {
+	// 	USART_Transmit('B');
+	// 	USART_Transmit('\n');
+    //     USART_Transmit(GetReg(NRF_STATUS));
+	// 	USART_Transmit('\n');
+	// _delay_ms(500);
+    // }
 
-		_delay_ms(500);
-    }
+
+
+
+	// // //transmitter
+	// USART_Init(MYUBRR);
+	// InitSPI();
+	// nrf24L01_init();
+	// uint8_t W_buffer[5];
+	// int i;
+	// for(i=0; i<5; ++i)
+	// {
+	// 	W_buffer[i]=0x24;
+	// }
+	// while(1)
+	// {
+	//  	// USART_Transmit('T');
+	// 	// USART_Transmit('B');
+	//  	// USART_Transmit('\n');
+
+	// 	transmit_payload(W_buffer);
+	// 	// while((GetReg(NRF_STATUS) & (1<<4)) !=0)
+	// 	// {
+	// 	// 	uint8_t new[1];
+	// 	// 	new[0] = (GetReg(NRF_STATUS) & ~(1<<4));
+	// 	// 	WriteToNrf(W, NRF_STATUS, new, 1);
+	// 	// 	USART_Print_Int(new[0]);
+	// 	// 	USART_Print_Int((GetReg(NRF_STATUS)));
+	// 	// }
+	// 	if((GetReg(NRF_STATUS) & (1<<4)) !=0)
+	// 	{
+	// 		USART_Transmit('T');
+	// 		USART_Transmit('E');
+	// 		USART_Transmit('\n');
+	// 	} else
+	// 	{
+	// 		USART_Transmit('S');
+	// 		USART_Transmit('E');
+	// 		USART_Transmit('\n');
+	// 	}
+		
+	// }
+
+
+
+
+// // //receiver
+	USART_Init(MYUBRR);
+	InitSPI();
+	// INT0_interrupt_init();
+	nrf24L01_init_receive();
+
+	uint8_t* R_buffer;
+	int i;
+	for(i=0; i<5; ++i)
+	{
+		R_buffer[i]=0x54;
+	}
+	while(1)
+	{
+	 	// USART_Transmit('R');
+		// USART_Transmit('B');
+	 	// USART_Transmit('\n');
+
+       	receive_payload();
+		if ((GetReg(NRF_STATUS)&(1<<6)) !=0)
+		{
+			data=WriteToNrf(R, R_RX_PAYLOAD, data, dataLen);	//read out received message
+			CLEARBIT(PORTB, 1);		//ce low - stop sending/listening
+
+			//Receiver function to print out on usart:
+			R_buffer=WriteToNrf(R, R_RX_PAYLOAD, R_buffer, dataLen);	//read out received message
+			reset();
+
+			for (int i=0;i<dataLen;i++)
+			{
+				USART_Print_Int(R_buffer[i]);
+			}
+			USART_Transmit('R');
+			USART_Transmit('\n');
+		}
+		// for (int i=0;i<dataLen;i++)	
+		// {
+		// 	USART_Transmit(data[i]);
+		// 	USART_Transmit('\n');
+		// }
+		// USART_Transmit('R');
+		// USART_Transmit('E');
+		// USART_Transmit('\n');
+	}
+
+
+
+
+	// //check address of receiver
+	// USART_Init(MYUBRR);
+	// InitSPI();
+	// nrf24L01_init();
+	// while(1)
+	// {
+	// 	uint8_t val[5];
+
+	// 	val[0] = 0x01;
+	// 	WriteToNrf(W, EN_RXADDR, val, 1); //enable data pipe 0
+
+
+	// 	//Write 5 bytes to the nRF
+	// 	//RX_ADDR_P0 registry. 1-5 bytes - the receiver address in channel P0
+	// 	int i;
+	// 	for(i=0; i<5; i++)
+	// 	{
+	// 		val[i] = 0x12;
+	// 	}
+	// 	WriteToNrf(W, RX_ADDR_P0, val, 5);
+
+	// 	//Read an array of bytes from the nRF
+	// 	uint8_t* data;
+	// 	data = WriteToNrf(R, RX_ADDR_P0, data, 5);
+	// 	for (int i=0;i<dataLen;i++)	
+	// 	{
+	// 		USART_Print_Int(data[i]);
+	// 	} 
+	// 	_delay_ms(1000);
+	// }
 
 }
 
+// void INT0_interrupt_init(void)	
+// {
+// 	DDRD &= ~(1<<DDD2);	//Extern interrupt på INT0, dvs sätt den till input!
+	
+// 	EICRA |=  (1<<ISC01);// INT0 falling edge	PD2
+// 	EICRA  &=  ~(1<<ISC00);// INT0 falling edge	PD2
 
+// 	EIMSK |=  (1<<INT0);	//enablar int0
+//   	//sei();              // Enable global interrupts görs sen
+// } 
+
+
+// ISR(INT0_vect)	//vektorn som går igång när transmit_payload lyckats sända eller när receive_payload fått data OBS: då Mask_Max_rt är satt i config registret så går den inte igång när MAX_RT är uppnåd å sändninge nmisslyckats!
+// {
+// 	cli();	//Disable global interrupt
+// 	CLEARBIT(PORTB, 1);		//ce low - stop sending/listening
+	
+// 	SETBIT(PORTB, 0); //led on to show success
+// 	_delay_ms(500);
+// 	CLEARBIT(PORTB, 0); //led off
+	
+// 	Receiver function to print out on usart:
+// 	data=WriteToNrf(R, R_RX_PAYLOAD, data, dataLen);	//read out received message
+// 	reset();
+
+// 	for (int i=0;i<dataLen;i++)
+// 	{
+// 		USART_Transmit(data[i]);
+// 	}
+	
+// 	sei();
+
+// }

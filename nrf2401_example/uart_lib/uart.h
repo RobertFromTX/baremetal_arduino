@@ -12,7 +12,7 @@ void USART_Transmit(unsigned char data);
 
 void USART_Flush(void);
 
-
+void USART_Print_Int(int data);
 
 #ifdef __cplusplus
 }

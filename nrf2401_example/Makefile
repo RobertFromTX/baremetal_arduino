@@ -19,7 +19,7 @@ main:
 	#taking output elf (nRF2401_Transmitter.bin that we got from compilation), removing eeprom section, 
 	#outputting it as intel hex in nRF2401_Transmitter.hex #avrdude (program that flashes our code) takes in intel hex format
 	avr-objcopy -O ihex -R .eeprom nRF2401_Transmitter.bin nRF2401_Transmitter.hex 
-	sudo avrdude -F -V -c arduino -p ATMEGA328p -P /dev/ttyUSB0 -b 115200 -U flash:w:nRF2401_Transmitter.hex
+	sudo avrdude -F -V -c arduino -p ATMEGA328p -P /dev/ttyUSB2 -b 115200 -U flash:w:nRF2401_Transmitter.hex
 
 clean:
 
