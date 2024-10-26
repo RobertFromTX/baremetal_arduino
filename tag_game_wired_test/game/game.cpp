@@ -1,6 +1,7 @@
+//CODE NOT COMPLETED, GO TO WIRELESS GAME
+
 #include "spi.h" 
 //#include "./../spi_lib/spi.h"
-#include <RF24/RF24.h>
 #include "uart.h"
 
 #include <avr/io.h> //not sure if this ruins it since already included in spi.h
@@ -11,7 +12,7 @@
 #define BAUD 115200
 #define MYUBRR ((FOSC/(16UL*BAUD))-1)
 
-struct position
+struct position;
 
 int main(void)
 {

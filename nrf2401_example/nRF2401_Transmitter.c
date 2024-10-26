@@ -645,7 +645,7 @@ int transmitter(void)
 	uint8_t TxAddress[] = {0xEE, 0xDD, 0xCC, 0xBB, 0xAA};
 	uint8_t TxData[32];// = "HHHHHHHHHHHHHHHHHHHH\n";//"Hello World\n";
 	for (int i = 0; i < 32; i++) {
-        TxData[i] = 'H';
+        TxData[i] = 'R';
     }
 	nrf24_TxMode(TxAddress, 10);
 
@@ -674,8 +674,8 @@ int main(void)
 	// _delay_ms(500);
     // }
 
-	//transmitter();
-	receiver();
+	transmitter();
+	//receiver();
 
 
 

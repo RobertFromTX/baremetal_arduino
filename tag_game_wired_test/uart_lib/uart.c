@@ -1,3 +1,5 @@
+#include "uart.h"
+
 //code from page 150, 168 and 169 of atmega398 datasheet, look at sections with 5-8 bit data
 #include <avr/io.h>
 #include <util/delay.h>

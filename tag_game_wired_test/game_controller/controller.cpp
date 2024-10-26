@@ -1,3 +1,5 @@
+////CODE NOT COMPLETED, GO TO WIRELESS GAME
+
 #include "spi.h" 
 //#include "./../spi_lib/spi.h"
 
@@ -25,7 +27,6 @@ int main(void)
 
         if((PIND & 1<<PORTD2))
         {
-
             USART_Transmit('W');
             USART_Transmit('\n');
             SPI_SlaveTransmit('W');
